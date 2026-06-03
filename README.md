@@ -235,7 +235,7 @@ Pending → Confirmed → Shipped → Delivered / Cancelled
 * Session-based cart persistence
 
 ---
-##Project images
+## Project images
 <img width="1895" height="954" alt="image" src="https://github.com/user-attachments/assets/a173134c-79e0-4b44-a2c9-8dc322f76c7b" />
 <img width="1908" height="811" alt="image" src="https://github.com/user-attachments/assets/18869cba-157c-4ca4-97bd-1b840e9af06a" />
 <img width="1914" height="938" alt="image" src="https://github.com/user-attachments/assets/46adbe30-170e-469d-b4af-680999dd98ab" />
