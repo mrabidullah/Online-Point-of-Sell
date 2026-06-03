@@ -1,0 +1,173 @@
+{% extends 'dashboard/_layout.html' %}
+
+{% block dash %}
+<div class="max-w-4xl mx-auto">
+  <!-- Header -->
+  <div class="mb-6">
+    <div class="flex items-center gap-2 text-sm text-slate-500 mb-2">
+      <a href="{% url 'dash_products' %}" class="hover:text-primary transition">
+        <i class="fas fa-boxes"></i> Products
+      </a>
+      <i class="fas fa-chevron-right text-xs"></i>
+      <span class="text-primary font-medium">{{ title }}</span>
+    </div>
+    <h1 class="text-2xl md:text-3xl font-bold text-primary flex items-center gap-2">
+      <i class="fas fa-edit text-accent"></i>
+      {{ title }}
+    </h1>
+    <p class="text-slate-500 text-sm mt-1">
+      {% if 'Edit' in title %}Update product information and details{% else %}Add a new product to your inventory{% endif %}
+    </p>
+  </div>
+
+  <!-- Form Card -->
+  <div class="bg-white rounded-2xl shadow-card border border-slate-100 overflow-hidden">
+    <form method="post" enctype="multipart/form-data" class="p-6 space-y-5">
+      {% csrf_token %}
+      
+      <!-- Form Fields -->
+      {% for field in form %}
+      <div class="space-y-1">
+        <label class="block text-sm font-semibold text-slate-700">
+          {{ field.label }}
+          {% if field.field.required %}
+          <span class="text-accent text-xs ml-1">*</span>
+          {% endif %}
+        </label>
+        
+        <!-- Special styling for different field types -->
+        {% if field.name == 'image' %}
+        <div class="mt-1">
+          {{ field }}
+          {% if field.value %}
+          <div class="mt-2 flex items-center gap-2">
+            <div class="w-16 h-16 rounded-lg bg-slate-100 overflow-hidden">
+              <img src="{{ field.value.url }}" class="w-full h-full object-cover" alt="Current image">
+            </div>
+            <p class="text-xs text-slate-400">Current image</p>
+          </div>
+          {% endif %}
+        </div>
+        {% elif field.field.widget.input_type == 'checkbox' %}
+        <label class="flex items-center gap-2 cursor-pointer">
+          {{ field }}
+          <span class="text-sm text-slate-600">{{ field.help_text }}</span>
+        </label>
+        {% else %}
+        {{ field }}
+        {% endif %}
+        
+        {% if field.help_text and field.field.widget.input_type != 'checkbox' %}
+        <p class="text-xs text-slate-400 mt-1">{{ field.help_text }}</p>
+        {% endif %}
+        
+        {% if field.errors %}
+        <div class="flex items-center gap-1 mt-1">
+          <i class="fas fa-exclamation-circle text-red-500 text-xs"></i>
+          {% for error in field.errors %}
+          <p class="text-xs text-red-500">{{ error }}</p>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+      
+      <!-- Form Actions -->
+      <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-slate-100">
+        <button type="submit" class="btn-primary px-6 py-2.5 justify-center">
+          <i class="fas fa-save mr-2"></i> Save Product
+        </button>
+        <a href="{% url 'dash_products' %}" class="btn-outline justify-center">
+          <i class="fas fa-times mr-2"></i> Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+  
+  <!-- Help Tips -->
+  <div class="mt-6 p-4 bg-accent/5 rounded-xl border border-accent/20">
+    <div class="flex items-start gap-3">
+      <i class="fas fa-lightbulb text-accent mt-0.5"></i>
+      <div>
+        <p class="text-sm font-semibold text-primary">Quick Tips</p>
+        <ul class="text-xs text-slate-500 mt-1 space-y-1">
+          <li>• Product images should be clear and well-lit for best results</li>
+          <li>• Set accurate stock levels to avoid overselling</li>
+          <li>• Inactive products won't appear in the shop</li>
+          <li>• Prices can be updated anytime from this form</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Custom CSS for form styling -->
+<style>
+  /* Style all form inputs */
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    border-radius: 0.75rem;
+    border: 1px solid #e2e8f0;
+    background-color: white;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+  }
+  
+  input:not([type="checkbox"]):not([type="radio"]):focus,
+  select:focus,
+  textarea:focus {
+    outline: none;
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  }
+  
+  /* File input styling */
+  input[type="file"] {
+    padding: 0.5rem;
+    background-color: #f8fafc;
+  }
+  
+  input[type="file"]::file-selector-button {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    border: none;
+    background-color: #e2e8f0;
+    color: #334155;
+    font-weight: 500;
+    cursor: pointer;
+    margin-right: 1rem;
+    transition: all 0.2s;
+  }
+  
+  input[type="file"]::file-selector-button:hover {
+    background-color: #cbd5e1;
+  }
+  
+  /* Checkbox styling */
+  input[type="checkbox"] {
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 0.25rem;
+    border: 1px solid #cbd5e1;
+    cursor: pointer;
+  }
+  
+  input[type="checkbox"]:checked {
+    background-color: #10b981;
+    border-color: #10b981;
+  }
+  
+  /* Number input arrows */
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+  
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    opacity: 0.5;
+  }
+</style>
+{% endblock %}

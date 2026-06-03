@@ -1,0 +1,305 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>{% block title %}NovaPOS — Professional Point of Sale{% endblock %}</title>
+
+<!-- Tailwind CSS v3 + Font Awesome Icons -->
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          'sans': ['Inter', 'system-ui', 'sans-serif'],
+        },
+        colors: {
+          'primary': '#0f3b2c',
+          'primary-dark': '#0a2e22',
+          'primary-light': '#1a5a44',
+          'secondary': '#2d4a6e',
+          'accent': '#10b981',
+          'accent-dark': '#059669',
+          'accent-light': '#34d399',
+          'warm': '#f5f0e8',
+          'surface': '#fafaf8',
+        },
+        boxShadow: {
+          'soft': '0 4px 12px rgba(0,0,0,0.03), 0 1px 2px rgba(0,0,0,0.02)',
+          'card': '0 20px 30px -12px rgba(0,0,0,0.08), 0 1px 1px rgba(0,0,0,0.02)',
+          'elevated': '0 20px 35px -10px rgba(0,0,0,0.12)',
+          'glow': '0 0 0 4px rgba(16,185,129,0.12)',
+        },
+        animation: {
+          'fade-in': 'fadeIn 0.4s ease-out',
+          'slide-up': 'slideUp 0.4s ease-out',
+          'scale-in': 'scaleIn 0.2s ease-out',
+          'float': 'float 3s ease-in-out infinite',
+        },
+        keyframes: {
+          fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+          slideUp: { '0%': { transform: 'translateY(12px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
+          scaleIn: { '0%': { transform: 'scale(0.96)', opacity: '0' }, '100%': { transform: 'scale(1)', opacity: '1' } },
+          float: { '0%,100%': { transform: 'translateY(0px)' }, '50%': { transform: 'translateY(-8px)' } },
+        }
+      }
+    }
+  }
+</script>
+
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: linear-gradient(135deg, #fafaf8 0%, #f5f3ef 100%);
+    font-family: 'Inter', sans-serif;
+  }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: #e8e6e1; border-radius: 10px; }
+  ::-webkit-scrollbar-thumb { background: #a3b8a8; border-radius: 10px; }
+  ::-webkit-scrollbar-thumb:hover { background: #7f9b87; }
+  
+  /* Modern card with professional hover */
+  .product-card {
+    background: white;
+    border-radius: 1.25rem;
+    transition: all 0.35s cubic-bezier(0.2, 0, 0, 1);
+    border: 1px solid #eae8e2;
+  }
+  .product-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 30px 40px -15px rgba(0, 0, 0, 0.12);
+    border-color: #d4d0c8;
+  }
+  
+  /* Professional button styles */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm 
+           bg-primary text-white hover:bg-primary-dark transition-all duration-200 
+           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/40;
+  }
+  .btn-accent {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm 
+           bg-accent text-white hover:bg-accent-dark transition-all duration-200 
+           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent/40;
+  }
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-medium text-sm 
+           border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-300 
+           transition-all duration-200;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium text-sm 
+           text-slate-600 hover:bg-slate-100 hover:text-primary transition-all duration-200;
+  }
+  
+  /* Form inputs */
+  .input-modern {
+    @apply w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 
+           placeholder:text-slate-400 transition-all duration-200 
+           focus:border-accent focus:ring-2 focus:ring-accent/20 focus:outline-none;
+  }
+  label {
+    @apply block text-sm font-semibold text-slate-700 mb-1.5;
+  }
+  
+  /* Category pills */
+  .category-pill {
+    @apply px-4 py-2 rounded-full text-sm font-medium transition-all duration-200;
+  }
+  .category-pill-active {
+    @apply bg-primary text-white shadow-md;
+  }
+  .category-pill-inactive {
+    @apply bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 hover:border-slate-300;
+  }
+  
+  /* Cart badge */
+  .cart-badge {
+    @apply absolute -top-1.5 -right-1.5 bg-accent text-white text-[11px] font-bold rounded-full 
+           h-5 w-5 flex items-center justify-center shadow-sm;
+  }
+  
+  /* Professional hero gradient */
+  .hero-gradient {
+    background: linear-gradient(135deg, #0f3b2c 0%, #1a5a44 50%, #2d4a6e 100%);
+  }
+</style>
+{% block extra_head %}{% endblock %}
+</head>
+
+<body class="min-h-screen flex flex-col antialiased">
+
+<!-- ========== MODERN PROFESSIONAL HEADER ========== -->
+<header class="sticky top-0 z-50 bg-white/98 backdrop-blur-xl border-b border-slate-100 shadow-soft">
+  <div class="max-w-7xl mx-auto px-5 lg:px-8">
+    <div class="flex items-center justify-between h-16 lg:h-18">
+      
+      <!-- Logo - Professional -->
+      <a href="{% url 'product_list' %}" class="flex items-center gap-3 group">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-white shadow-md transition group-hover:scale-105">
+          <i class="fas fa-chart-line text-sm"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-xl tracking-tight text-primary">Nova<span class="text-accent">POS</span></h1>
+          <p class="text-[10px] font-medium text-slate-400 tracking-wider">PROFESSIONAL</p>
+        </div>
+      </a>
+      
+      <!-- Desktop Navigation -->
+      <nav class="hidden md:flex items-center gap-1">
+        <a href="{% url 'product_list' %}" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary hover:bg-slate-50 transition font-medium text-sm flex items-center gap-2">
+          <i class="fas fa-store text-xs"></i> Shop
+        </a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'my_orders' %}" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary hover:bg-slate-50 transition font-medium text-sm flex items-center gap-2">
+          <i class="fas fa-receipt text-xs"></i> Orders
+        </a>
+        {% endif %}
+        {% if user.is_staff %}
+        <a href="{% url 'dash_home' %}" class="px-4 py-2 rounded-lg text-slate-600 hover:text-primary hover:bg-slate-50 transition font-medium text-sm flex items-center gap-2">
+          <i class="fas fa-chart-line text-xs"></i> Dashboard
+        </a>
+        {% endif %}
+      </nav>
+      
+      <!-- Right Section -->
+      <div class="flex items-center gap-2">
+        <!-- Cart -->
+        <a href="{% url 'cart_detail' %}" class=" relative flex items-center gap-2 px-3 py-2 rounded-xl text-slate-600 hover:bg-green-500 transition-all ">
+          <i class="fas fa-shopping-bag text-lg  "></i>
+          <span class="hidden sm:inline text-sm font-medium ">Cart</span>
+          {% if cart_count %}
+          <span class="cart-badge">{{ cart_count }}</span>
+          {% endif %}
+        </a>
+        
+        {% if user.is_authenticated %}
+        <div class="hidden lg:flex items-center gap-3 pl-3 ml-1 border-l border-slate-200">
+          <div class="text-right">
+            <p class="text-[10px] text-slate-400 uppercase tracking-wider">Welcome</p>
+            <p class="text-sm font-semibold text-primary">{{ user.first_name|default:user.username }}</p>
+          </div>
+          <form method="post" action="{% url 'logout' %}" class="inline">
+            {% csrf_token %}
+            <button class="btn-outline !py-1.5 !px-3 text-xs hover:bg-green-500 hover:text-white rounded-xl ">
+              <i class="fas fa-sign-out-alt mr-1"></i> Exit
+            </button>
+          </form>
+        </div>
+        {% else %}
+        <div class="flex items-center gap-2">
+          <a href="{% url 'login' %}" class="btn-outline !py-2 !px-4 text-sm hover:bg-green-500 hover:text-white rounded-xl ">
+            <i class="fas fa-key mr-1"></i> Login
+          </a>
+          <a href="{% url 'signup' %}" class="btn-primary !py-2 !px-4 text-sm hover:bg-green-500 hover:text-white rounded-xl ">
+            <i class="fas fa-user-plus mr-1"></i> Sign up
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile Bottom Navigation -->
+<div class="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-slate-100 z-40 shadow-elevated">
+  <div class="flex justify-around py-3">
+    <a href="{% url 'product_list' %}" class="flex flex-col items-center text-slate-500 hover:text-primary transition text-xs">
+      <i class="fas fa-store text-xl mb-0.5"></i>
+      <span>Shop</span>
+    </a>
+    {% if user.is_authenticated %}
+    <a href="{% url 'my_orders' %}" class="flex flex-col items-center text-slate-500 hover:text-primary transition text-xs">
+      <i class="fas fa-receipt text-xl mb-0.5"></i>
+      <span>Orders</span>
+    </a>
+    {% endif %}
+    {% if user.is_staff %}
+    <a href="{% url 'dash_home' %}" class="flex flex-col items-center text-slate-500 hover:text-primary transition text-xs">
+      <i class="fas fa-chart-simple text-xl mb-0.5"></i>
+      <span>Stats</span>
+    </a>
+    {% endif %}
+    <a href="{% url 'cart_detail' %}" class="relative flex flex-col items-center text-slate-500 hover:text-primary transition text-xs">
+      <i class="fas fa-shopping-bag text-xl mb-0.5"></i>
+      <span>Cart</span>
+      {% if cart_count %}
+      <span class="absolute -top-1 -right-2 bg-accent text-white text-[9px] rounded-full w-4 h-4 flex items-center justify-center">{{ cart_count }}</span>
+      {% endif %}
+    </a>
+  </div>
+</div>
+
+<!-- Flash Messages -->
+{% if messages %}
+<div class="max-w-7xl mx-auto w-full px-5 lg:px-8 mt-5 animate-fade-in">
+  {% for m in messages %}
+  <div class="mb-3 flex items-center gap-3 p-4 rounded-xl shadow-soft border-l-4 backdrop-blur-sm
+      {% if m.tags == 'error' %}
+        bg-red-50/90 border-red-500 text-red-700
+      {% else %}
+        bg-emerald-50/90 border-emerald-500 text-emerald-700
+      {% endif %}
+  ">
+    <i class="{% if m.tags == 'error' %}fas fa-exclamation-circle{% else %}fas fa-check-circle{% endif %} text-base"></i>
+    <span class="text-sm font-medium">{{ m }}</span>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- MAIN CONTENT -->
+<main class="flex-1 w-full py-8 md:py-12">
+  <div class="max-w-7xl mx-auto px-5 lg:px-8 animate-slide-up">
+    {% block content %}
+    <div class="text-center py-16">
+      <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 mb-6">
+        <i class="fas fa-chart-line text-3xl text-primary"></i>
+      </div>
+      <h2 class="text-3xl font-bold text-primary">Welcome to NovaPOS</h2>
+      <p class="text-slate-500 mt-3 max-w-md mx-auto">Professional dashboard & smart inventory system for modern commerce.</p>
+    </div>
+    {% endblock %}
+  </div>
+</main>
+
+<!-- Professional Footer -->
+<footer class="border-t border-slate-100 bg-white mt-16 py-8">
+  <div class="max-w-7xl mx-auto px-5 lg:px-8">
+    <div class="flex flex-col md:flex-row justify-between items-center gap-5">
+      <div class="flex items-center gap-2">
+        <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-white">
+          <i class="fas fa-chart-line text-[10px]"></i>
+        </div>
+        <span class="font-bold text-primary text-sm">NovaPOS</span>
+        <span class="text-slate-300 text-xs mx-2">|</span>
+        <span class="text-slate-400 text-xs">Professional Commerce Suite</span>
+      </div>
+      <div class="flex gap-6">
+        <a href="#" class="text-slate-400 hover:text-primary transition"><i class="fab fa-twitter"></i></a>
+        <a href="#" class="text-slate-400 hover:text-primary transition"><i class="fab fa-github"></i></a>
+        <a href="#" class="text-slate-400 hover:text-primary transition"><i class="fab fa-linkedin-in"></i></a>
+      </div>
+      <p class="text-xs text-slate-400 flex items-center gap-2">
+        <i class="fas fa-shield-alt"></i> Secure Checkout 
+        <span class="text-slate-300">•</span> 
+        <i class="fas fa-truck"></i> Cash on Delivery
+      </p>
+    </div>
+    <div class="mt-6 pt-5 border-t border-slate-100 text-center text-[11px] text-slate-400">
+      © 2026 NovaPOS — Professional Point of Sale System. All rights reserved.
+    </div>
+  </div>
+</footer>
+
+<!-- Spacing for mobile nav -->
+<div class="h-16 md:h-0"></div>
+
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

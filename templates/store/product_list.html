@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Hero Section - Professional & Modern -->
+<section class="relative overflow-hidden rounded-2xl hero-gradient text-white mb-10 shadow-card">
+  <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.03"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
+  <div class="relative px-6 py-12 md:py-16 text-center md:text-left md:px-10">
+    <div class="max-w-2xl">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="inline-block px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm text-xs font-semibold tracking-wide">
+          <i class="fas fa-crown mr-1 text-xs"></i> Premium Collection
+        </span>
+      </div>
+      <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
+        Smart Point of Sale,<br>Beautifully Simple.
+      </h1>
+      <p class="mt-4 text-white/85 text-base max-w-lg">
+        Browse our premium catalog, build your order, and checkout securely with Cash on Delivery.
+      </p>
+      
+      <!-- Search Bar -->
+      <form method="get" class="mt-6 flex flex-col sm:flex-row gap-3">
+        <div class="flex-1 relative">
+          <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+          <input type="text" name="q" value="{{ q|default:'' }}" placeholder="Search products..." 
+                 class="w-full pl-11 pr-4 py-3 rounded-xl bg-white text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-white/30">
+        </div>
+        <button type="submit" class="px-6 py-3 rounded-xl bg-accent text-white font-semibold hover:bg-accent-dark transition-all shadow-md hover:shadow-lg">
+          <i class="fas fa-search mr-2"></i> Search
+        </button>
+      </form>
+    </div>
+  </div>
+  <!-- Decorative floating elements -->
+  <div class="absolute bottom-0 right-0 w-72 h-72 bg-white/5 rounded-full blur-3xl -mb-36 -mr-36 animate-float"></div>
+  <div class="absolute top-0 left-1/3 w-48 h-48 bg-white/5 rounded-full blur-2xl -mt-20"></div>
+</section>
+
+<!-- Categories -->
+{% if categories %}
+<div class="mb-10">
+  <div class="flex items-center justify-between mb-5">
+    <h2 class="text-lg font-bold text-primary">
+      <i class="fas fa-tag text-accent mr-2"></i> Browse Categories
+    </h2>
+    <span class="text-xs text-slate-400 bg-white px-3 py-1 rounded-full">{{ categories|length }} categories</span>
+  </div>
+  <div class="flex flex-wrap gap-5 ">
+    <a href="{% url 'product_list' %}" class="category-pill hover:text-green-500 {% if not active_cat %}category-pill-active{% else %}category-pill-inactive{% endif %}">
+      <i class="fas fa-th-large mr-1.5 text-xs  "></i> All
+    </a>
+    {% for c in categories %}
+    <a href="?category={{ c.slug }}{% if q %}&q={{ q }}{% endif %}" 
+       class="category-pill hover:text-green-500 {% if active_cat == c.slug %}category-pill-active{% else %}category-pill-inactive{% endif %}">
+      {{ c.name }}
+    </a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<!-- Products Grid -->
+<div class="mb-8">
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-xl font-bold text-primary">
+      <i class="fas fa-star text-accent mr-2"></i> Featured Products
+    </h2>
+    <span class="text-sm text-slate-400 bg-white px-3 py-1 rounded-full">{{ products|length }} items</span>
+  </div>
+  
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    {% for p in products %}
+    <div class="product-card group overflow-hidden">
+      <!-- Product Image -->
+      <a href="{% url 'product_detail' p.pk %}" class="block aspect-square bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center overflow-hidden relative">
+        {% if p.image %}
+        <img src="{{ p.image.url }}" alt="{{ p.name }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+        {% else %}
+        <i class="fas fa-box-open text-5xl text-slate-300"></i>
+        {% endif %}
+        <!-- Quick view overlay -->
+        <div class="absolute inset-0 bg-primary/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+          <span class="bg-white/90 backdrop-blur text-primary px-3 py-1.5 rounded-full text-xs font-semibold">
+            <i class="fas fa-eye mr-1"></i> Quick View
+          </span>
+        </div>
+      </a>
+      
+      <!-- Product Info -->
+      <div class="p-4">
+        {% if p.category %}
+        <span class="text-xs font-medium text-accent bg-accent/10 px-2 py-0.5 rounded-full">
+          {{ p.category.name }}
+        </span>
+        {% endif %}
+        <h3 class="font-bold text-slate-800 mt-2 line-clamp-1">{{ p.name }}</h3>
+        <div class="flex items-center justify-between mt-3">
+          <div>
+            <span class="text-xl font-bold text-primary">${{ p.price }}</span>
+            {% if p.stock > 0 %}
+            <span class="text-[10px] text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full ml-2">In stock</span>
+            {% endif %}
+          </div>
+          <form method="post" action="{% url 'cart_add' p.pk %}" class="inline">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <button class="w-9 h-9 rounded-xl bg-primary text-white hover:bg-primary-dark transition-all shadow-md hover:shadow-lg flex items-center justify-center">
+              <i class="fas fa-plus text-sm"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-span-full text-center py-16">
+      <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-slate-100 mb-4">
+        <i class="fas fa-search text-2xl text-slate-400"></i>
+      </div>
+      <p class="text-slate-500 text-lg">No products found</p>
+      <p class="text-slate-400 text-sm mt-1">Try adjusting your search or browse all categories.</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

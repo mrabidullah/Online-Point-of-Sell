@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+  <!-- Page Header -->
+  <div class="mb-8">
+    <div class="flex items-center gap-2 text-sm text-slate-500 mb-2">
+      <a href="{% url 'cart_detail' %}" class="hover:text-primary transition hover:bg-green-500 hover:text-white rounded-xl">
+        <i class="fas fa-shopping-bag"></i> Cart
+      </a>
+      <i class="fas fa-chevron-right text-xs"></i>
+      <span class="text-primary font-medium">Checkout</span>
+    </div>
+    <h1 class="text-2xl md:text-3xl font-bold text-primary flex items-center gap-3">
+      <i class="fas fa-clipboard-list text-accent text-2xl"></i>
+      Checkout
+    </h1>
+    <p class="text-slate-500 mt-1 text-sm">Complete your order with delivery details</p>
+  </div>
+
+  <div class="grid lg:grid-cols-3 gap-8">
+    <!-- Checkout Form Section -->
+    <div class="lg:col-span-2">
+      <div class="bg-white rounded-2xl shadow-card border border-slate-100 overflow-hidden">
+        <div class="p-6">
+          <h2 class="text-lg font-bold text-primary mb-5 flex items-center gap-2">
+            <i class="fas fa-map-marker-alt text-accent text-sm"></i>
+            Delivery Information
+          </h2>
+          
+          <form method="post" class="space-y-5">
+            {% csrf_token %}
+            
+            {% for field in form %}
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-1.5">
+                {{ field.label }}
+                {% if field.field.required %}
+                <span class="text-accent text-xs">*</span>
+                {% endif %}
+              </label>
+              {{ field }}
+              {% if field.errors %}
+              <p class="text-xs text-red-500 mt-1 flex items-center gap-1">
+                <i class="fas fa-exclamation-circle"></i> {{ field.errors|join:', ' }}
+              </p>
+              {% endif %}
+              {% if field.help_text %}
+              <p class="text-xs text-slate-400 mt-1">{{ field.help_text }}</p>
+              {% endif %}
+            </div>
+            {% endfor %}
+            
+            <!-- Payment Method Card -->
+            <div class="mt-6 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-5 border border-emerald-100">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0">
+                  <i class="fas fa-money-bill-wave text-accent text-lg"></i>
+                </div>
+                <div>
+                  <h3 class="font-bold text-primary">Cash on Delivery</h3>
+                  <p class="text-sm text-slate-600 mt-0.5">Pay in cash when your order arrives at your doorstep. No card or online payment required.</p>
+                  <div class="flex items-center gap-2 mt-2 text-xs text-slate-500">
+                    <i class="fas fa-check-circle text-accent"></i>
+                    <span>Pay only when you receive</span>
+                    <span class="mx-1">•</span>
+                    <i class="fas fa-shield-alt text-accent"></i>
+                    <span>100% secure</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Order Notes (Optional) -->
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-1.5">
+                <i class="fas fa-pen-alt mr-1 text-slate-400"></i> Order Notes (Optional)
+              </label>
+              <textarea name="notes" rows="2" placeholder="Special delivery instructions, gate code, etc." 
+                        class="input-modern resize-none"></textarea>
+            </div>
+            
+            <button type="submit" class="btn-primary w-full py-3.5 text-base justify-center mt-4 hover:bg-green-500 hover:text-white rounded-xl">
+              <i class="fas fa-check-circle mr-2"></i> Place Order
+            </button>
+          </form>
+        </div>
+      </div>
+      
+      <!-- Trust Signals -->
+      <div class="grid grid-cols-2 gap-3 mt-5">
+        <div class="flex items-center gap-2 text-xs text-slate-500 bg-white rounded-xl px-3 py-2 border border-slate-100">
+          <i class="fas fa-lock text-accent"></i>
+          <span>Secure Checkout</span>
+        </div>
+        <div class="flex items-center gap-2 text-xs text-slate-500 bg-white rounded-xl px-3 py-2 border border-slate-100">
+          <i class="fas fa-undo-alt text-accent"></i>
+          <span>Easy Returns</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Summary Sidebar -->
+    <div class="lg:col-span-1">
+      <div class="bg-white rounded-2xl shadow-card border border-slate-100 sticky top-24">
+        <div class="p-5 border-b border-slate-100">
+          <h2 class="font-bold text-primary flex items-center gap-2">
+            <i class="fas fa-receipt text-accent"></i>
+            Order Summary
+          </h2>
+        </div>
+        
+        <!-- Cart Items List -->
+        <div class="p-5 space-y-3 max-h-80 overflow-y-auto">
+          {% for item in cart %}
+          <div class="flex justify-between items-start text-sm">
+            <div class="flex-1">
+              <span class="font-medium text-slate-700">{{ item.name }}</span>
+              <span class="text-slate-400 text-xs ml-1">× {{ item.quantity }}</span>
+            </div>
+            <span class="font-semibold text-slate-800">${{ item.subtotal }}</span>
+          </div>
+          {% endfor %}
+        </div>
+        
+        <!-- Price Breakdown -->
+        <div class="px-5 py-3 border-t border-slate-100 space-y-2">
+          <div class="flex justify-between text-sm text-slate-600">
+            <span>Subtotal</span>
+            <span>${{ cart.total }}</span>
+          </div>
+          <div class="flex justify-between text-sm text-slate-600">
+            <span>Delivery Fee</span>
+            <span class="text-emerald-600">Free</span>
+          </div>
+          <div class="flex justify-between text-sm text-slate-600">
+            <span>Tax (est.)</span>
+            <span>$0.00</span>
+          </div>
+        </div>
+        
+        <!-- Total -->
+        <div class="p-5 border-t border-slate-100 bg-slate-50/50 rounded-b-2xl">
+          <div class="flex justify-between items-center">
+            <span class="font-bold text-primary">Total Amount</span>
+            <span class="text-2xl font-bold text-accent">${{ cart.total }}</span>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-2 flex items-center gap-1">
+            <i class="fas fa-info-circle"></i>
+            Includes all taxes and fees
+          </p>
+        </div>
+        
+        <!-- Delivery Info Badge -->
+        <div class="p-4 text-center border-t border-slate-100">
+          <div class="flex items-center justify-center gap-2 text-xs text-slate-500">
+            <i class="fas fa-truck text-accent"></i>
+            <span>Estimated delivery: 2-4 business days</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Support Info -->
+      <div class="mt-4 text-center">
+        <div class="inline-flex items-center gap-2 text-xs text-slate-400 bg-white px-4 py-2 rounded-full shadow-soft">
+          <i class="fas fa-headset text-accent"></i>
+          <span>Need help? Contact support</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Style form inputs to match the design */
+  .input-modern {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    border: 1px solid #e2e8f0;
+    background-color: white;
+    transition: all 0.2s;
+  }
+  .input-modern:focus {
+    outline: none;
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  }
+  input, select, textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    border: 1px solid #e2e8f0;
+    background-color: white;
+    transition: all 0.2s;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  }
+</style>
+{% endblock %}

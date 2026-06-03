@@ -1,0 +1,238 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+  <!-- Page Header -->
+  <div class="mb-8">
+    <div class="flex items-center gap-2 text-sm text-slate-500 mb-2">
+      <i class="fas fa-user"></i>
+      <span>My Account</span>
+      <i class="fas fa-chevron-right text-xs"></i>
+      <span class="text-primary font-medium">Orders</span>
+    </div>
+    <h1 class="text-2xl md:text-3xl font-bold text-primary flex items-center gap-3">
+      <i class="fas fa-receipt text-accent text-2xl"></i>
+      My Orders
+    </h1>
+    <p class="text-slate-500 mt-1 text-sm">Track and manage all your purchases</p>
+  </div>
+
+  {% if orders %}
+  <div class="space-y-4">
+    {% for order in orders %}
+    <!-- Order Card -->
+    <div class="bg-white rounded-2xl shadow-card border border-slate-100 overflow-hidden transition-all hover:shadow-elevated">
+      <!-- Order Header -->
+      <div class="px-5 py-4 bg-gradient-to-r from-slate-50 to-white border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div class="flex items-center gap-4 flex-wrap">
+          <div>
+            <p class="text-xs text-slate-400 uppercase tracking-wider">Order ID</p>
+            <p class="font-bold text-primary">#{{ order.id }}</p>
+          </div>
+          <div class="w-px h-8 bg-slate-200 hidden sm:block"></div>
+          <div>
+            <p class="text-xs text-slate-400 uppercase tracking-wider">Placed on</p>
+            <p class="font-medium text-slate-700 text-sm">{{ order.created_at|date:'F d, Y' }}</p>
+          </div>
+          <div class="w-px h-8 bg-slate-200 hidden sm:block"></div>
+          <div>
+            <p class="text-xs text-slate-400 uppercase tracking-wider">Time</p>
+            <p class="font-medium text-slate-700 text-sm">{{ order.created_at|date:'g:i A' }}</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <!-- Status Badge -->
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold
+            {% if order.status == 'delivered' %}
+              bg-emerald-100 text-emerald-700
+            {% elif order.status == 'cancelled' %}
+              bg-red-100 text-red-700
+            {% elif order.status == 'shipped' %}
+              bg-blue-100 text-blue-700
+            {% elif order.status == 'processing' %}
+              bg-amber-100 text-amber-700
+            {% else %}
+              bg-slate-100 text-slate-700
+            {% endif %}
+          ">
+            <i class="fas 
+              {% if order.status == 'delivered' %}fa-check-circle
+              {% elif order.status == 'cancelled' %}fa-times-circle
+              {% elif order.status == 'shipped' %}fa-truck
+              {% elif order.status == 'processing' %}fa-spinner fa-pulse
+              {% else %}fa-clock
+              {% endif %}
+            "></i>
+            {{ order.get_status_display }}
+          </span>
+          <button onclick="toggleOrderDetails('order-{{ order.id }}')" class="text-slate-400 hover:text-primary transition">
+            <i class="fas fa-chevron-down" id="icon-order-{{ order.id }}"></i>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Order Body - Summary View -->
+      <div class="px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div class="flex-1">
+          <p class="text-xs text-slate-400 mb-1">Items purchased</p>
+          <div class="flex flex-wrap items-center gap-2">
+            {% for item in order.items.all|slice:":3" %}
+            <span class="text-sm text-slate-600">
+              {{ item.quantity }}× {{ item.name }}
+              {% if not forloop.last %}<span class="text-slate-300">•</span>{% endif %}
+            </span>
+            {% endfor %}
+            {% if order.items.count > 3 %}
+            <span class="text-xs text-slate-400">+{{ order.items.count|add:"-3" }} more</span>
+            {% endif %}
+          </div>
+        </div>
+        <div class="text-right">
+          <p class="text-xs text-slate-400">Total Amount</p>
+          <p class="text-2xl font-bold text-primary">${{ order.total }}</p>
+        </div>
+      </div>
+      
+      <!-- Order Details - Expanded View (Hidden by default) -->
+      <div id="order-{{ order.id }}-details" class="hidden border-t border-slate-100 bg-slate-50/30">
+        <div class="p-5">
+          <div class="grid md:grid-cols-2 gap-6">
+            <!-- Items List -->
+            <div>
+              <h4 class="font-semibold text-primary text-sm mb-3 flex items-center gap-2">
+                <i class="fas fa-box-open text-accent text-xs"></i> Order Items
+              </h4>
+              <div class="space-y-3">
+                {% for item in order.items.all %}
+                <div class="flex justify-between items-center text-sm">
+                  <div>
+                    <span class="font-medium text-slate-700">{{ item.name }}</span>
+                    <span class="text-slate-400 text-xs ml-1">× {{ item.quantity }}</span>
+                  </div>
+                  <span class="text-slate-600">${{ item.subtotal }}</span>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+            
+            <!-- Delivery Information -->
+            <div>
+              <h4 class="font-semibold text-primary text-sm mb-3 flex items-center gap-2">
+                <i class="fas fa-map-marker-alt text-accent text-xs"></i> Delivery Details
+              </h4>
+              <div class="space-y-2 text-sm">
+                <p class="text-slate-600">
+                  <span class="font-medium">Name:</span> {{ order.delivery_name|default:"-" }}
+                </p>
+                <p class="text-slate-600">
+                  <span class="font-medium">Address:</span> {{ order.delivery_address|default:"-" }}
+                </p>
+                <p class="text-slate-600">
+                  <span class="font-medium">Phone:</span> {{ order.delivery_phone|default:"-" }}
+                </p>
+                <p class="text-slate-600">
+                  <span class="font-medium">Payment:</span> Cash on Delivery
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Order Timeline -->
+          <div class="mt-5 pt-4 border-t border-slate-200">
+            <h4 class="font-semibold text-primary text-sm mb-3 flex items-center gap-2">
+              <i class="fas fa-clock text-accent text-xs"></i> Order Timeline
+            </h4>
+            <div class="flex flex-wrap gap-4 text-xs">
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-accent"></div>
+                <span class="text-slate-500">Order Placed: {{ order.created_at|date:'M d, Y' }}</span>
+              </div>
+              {% if order.status == 'processing' or order.status == 'shipped' or order.status == 'delivered' %}
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-amber-500"></div>
+                <span class="text-slate-500">Processing: {{ order.created_at|date:'M d, Y' }}</span>
+              </div>
+              {% endif %}
+              {% if order.status == 'shipped' or order.status == 'delivered' %}
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+                <span class="text-slate-500">Shipped: Pending</span>
+              </div>
+              {% endif %}
+              {% if order.status == 'delivered' %}
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+                <span class="text-slate-500">Delivered: Pending</span>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          
+          
+          
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  
+  <!-- Pagination (if needed) -->
+  {% if is_paginated %}
+  <div class="flex justify-center gap-2 mt-8">
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition">
+      <i class="fas fa-chevron-left"></i>
+    </a>
+    {% endif %}
+    <span class="px-4 py-2 rounded-lg bg-primary text-white">Page {{ page_obj.number }}</span>
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition">
+      <i class="fas fa-chevron-right"></i>
+    </a>
+    {% endif %}
+  </div>
+  {% endif %}
+  
+  {% else %}
+  <!-- Empty State - No Orders -->
+  <div class="text-center py-16 bg-white rounded-2xl shadow-card border border-slate-100">
+    <div class="inline-flex items-center justify-center w-24 h-24 rounded-full bg-slate-100 mb-5">
+      <i class="fas fa-shopping-bag text-3xl text-slate-400"></i>
+    </div>
+    <h2 class="text-2xl font-bold text-slate-700 mb-2">No orders yet</h2>
+    <p class="text-slate-500 mb-6">You haven't placed any orders. Start shopping to see your orders here.</p>
+    <a href="{% url 'product_list' %}" class="btn-primary inline-flex hover:bg-green-500 hover:text-white rounded-xl">
+      <i class="fas fa-store mr-2"></i> Start Shopping
+    </a>
+    
+    <!-- Featured Products Suggestion -->
+    <div class="mt-8 pt-6 border-t border-slate-100">
+      <p class="text-sm text-slate-500 mb-3">Check out our best sellers</p>
+      <div class="flex flex-wrap justify-center gap-3">
+        <span class="px-3 py-1.5 bg-slate-50 rounded-full text-xs text-slate-600 cursor-pointer hover:bg-slate-100">Electronics</span>
+        <span class="px-3 py-1.5 bg-slate-50 rounded-full text-xs text-slate-600 cursor-pointer hover:bg-slate-100">Accessories</span>
+        <span class="px-3 py-1.5 bg-slate-50 rounded-full text-xs text-slate-600 cursor-pointer hover:bg-slate-100">Home Decor</span>
+        <span class="px-3 py-1.5 bg-slate-50 rounded-full text-xs text-slate-600 cursor-pointer hover:bg-slate-100">Gadgets</span>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+  function toggleOrderDetails(orderId) {
+    const detailsDiv = document.getElementById(orderId + '-details');
+    const icon = document.getElementById('icon-' + orderId);
+    
+    if (detailsDiv.classList.contains('hidden')) {
+      detailsDiv.classList.remove('hidden');
+      icon.classList.remove('fa-chevron-down');
+      icon.classList.add('fa-chevron-up');
+    } else {
+      detailsDiv.classList.add('hidden');
+      icon.classList.remove('fa-chevron-up');
+      icon.classList.add('fa-chevron-down');
+    }
+  }
+</script>
+{% endblock %}
