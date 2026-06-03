@@ -1,4 +1,4 @@
-````markdown
+
 # Online Point of Sale (POS) System
 
 A Django-based Point of Sale (POS) and e-commerce system designed for managing products, orders, and users with a role-based admin dashboard.
